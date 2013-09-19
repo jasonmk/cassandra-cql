@@ -105,9 +105,14 @@ module CassandraCQL
       raise Error::InvalidRequestException.new($!.why)
     end
 
-    def execute_cql_query(cql, compression=CassandraCQL::Thrift::Compression::NONE)
+    def execute_cql_query(cql, opts = {})
+      if opts.is_a?(FixNum)
+        opts = {:compression => opts}
+      end
+      opts.reverse_merge!(:compression => CassandraCQL::Thrift::Compression::NONE,
+                          :consistency => CassandraCQL::Thrift::ConsistencyLevel::QUORUM)
       if use_cql3?
-        @connection.execute_cql3_query(cql, compression, CassandraCQL::Thrift::ConsistencyLevel::QUORUM) #TODO consistency level
+        @connection.execute_cql3_query(cql, compression, opts[:consistency])
       else
         @connection.execute_cql_query(cql, compression)
       end
