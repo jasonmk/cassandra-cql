@@ -106,15 +106,15 @@ module CassandraCQL
     end
 
     def execute_cql_query(cql, opts = {})
-      if opts.is_a?(FixNum)
+      if opts.is_a?(Fixnum)
         opts = {:compression => opts}
       end
       opts.reverse_merge!(:compression => CassandraCQL::Thrift::Compression::NONE,
                           :consistency => CassandraCQL::Thrift::ConsistencyLevel::QUORUM)
       if use_cql3?
-        @connection.execute_cql3_query(cql, compression, opts[:consistency])
+        @connection.execute_cql3_query(cql, opts[:compression], opts[:consistency])
       else
-        @connection.execute_cql_query(cql, compression)
+        @connection.execute_cql_query(cql, opts[:compression])
       end
     rescue CassandraCQL::Thrift::InvalidRequestException
       raise Error::InvalidRequestException.new($!.why)

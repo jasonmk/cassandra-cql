@@ -38,13 +38,13 @@ module CassandraCQL
 
     def execute(bind_vars=[], options={})
       sanitized_query = self.class.sanitize(@statement, bind_vars, @handle.use_cql3?)
-      compression_type = CassandraCQL::Thrift::Compression::NONE
-      if options[:compression]
-        compression_type = CassandraCQL::Thrift::Compression::GZIP
+      if options[:compression] == CassandraCQL::Thrift::Compression::GZIP
         sanitized_query = Utility.compress(sanitized_query)
       end
 
-      res = Result.new(@handle.execute_cql_query(sanitized_query, compression_type))
+      
+
+      res = Result.new(@handle.execute_cql_query(sanitized_query, options))
 
       # Change our keyspace if required
       if @statement =~ KS_CHANGE_RE
